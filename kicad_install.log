@@ -1,0 +1,24 @@
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages were automatically installed and are no longer required:
+  bridge-utils dns-root-data dnsmasq-base netcat-openbsd ubuntu-fan
+Use 'sudo apt autoremove' to remove them.
+The following additional packages will be installed:
+  kicad-demos kicad-doc-en kicad-footprints kicad-libraries kicad-packages3d
+  kicad-symbols kicad-templates libfreeimage3 libgit2-1.7 libglew2.2
+  libglu1-mesa libhttp-parser2.9 libhwloc-plugins libhwloc15 libimagequant0
+  libimath-3-1-29t64 libjxr0t64 libltdl7 libmbedcrypto7t64 libmbedtls14t64
+  libmbedx509-1t64 libngspice0 libnng1 libocct-data-exchange-7.6t64
+  libocct-draw-7.6t64 libocct-foundation-7.6t64
+  libocct-modeling-algorithms-7.6t64 libocct-modeling-data-7.6t64
+  libocct-ocaf-7.6t64 libocct-visualization-7.6t64 libodbc2 libodbcinst2
+  libopenexr-3-1-30 libopengl0 libopenjp2-7 libpcre2-32-0 libprotobuf32t64
+  libraqm0 libraw23t64 libsecret-1-0 libsecret-common libtbb12 libtbbbind-2-5
+  libtbbmalloc2 libwebpdemux2 libwebpmux3 libwxbase3.2-1t64
+  libwxgtk-gl3.2-1t64 libwxgtk3.2-1t64 libxnvctrl0 occt-misc
+  ocl-icd-libopencl1 python3-olefile python3-pil python3-wxgtk4.0 unixodbc
+  unixodbc-common
+Suggested packages:
+  extra-xdg-menus kicad-libraries glew-utils libhwloc-contrib-plugins
+  odbc-postgresql tdsodbc opencl-icd python-pil-doc wx3.2-doc
