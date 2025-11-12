@@ -1,0 +1,36 @@
+name: KiCad ERC and DRC Checks
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install KiCad and jq
+      run: |
+        sudo add-apt-repository ppa:kicad/kicad-9.0-releases -y
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends kicad-nightly jq -y
+        sudo ln -s /usr/lib/kicad-nightly/bin/kicad-cli /usr/bin/kicad-cli
+        export LD_LIBRARY_PATH=/usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+        kicad-cli --version
+
+    - name: Run ERC and DRC
+      run: |
+        export LD_LIBRARY_PATH=/usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+        PROJECT_FILE=$(find . -maxdepth 1 -name "*.kicad_pro")
+
+        # Try to get schematic and pcb files using modern selectors, fallback to legacy
+        SCHEMATIC_FILE=$(jq -r '.root_sheet.path // .sheet_instances.root.sh_filename // .board.sch' $PROJECT_FILE)
+        PCB_FILE=$(jq -r '.board.filename' $PROJECT_FILE)
+
+        if [ -z "$SCHEMATIC_FILE" ] || [ -z "$PCB_FILE" ]; then
+          echo "Could not determine schematic or PCB filename from project file."
+          exit 1
+        fi
+
+        kicad-cli sch erc $SCHEMATIC_FILE
+        kicad-cli pcb drc $PCB_FILE
