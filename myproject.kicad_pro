@@ -1,0 +1,7 @@
+{
+  "board": {
+    "title": "myproject",
+    "filename": "myproject.kicad_pcb",
+    "sch": "myproject.kicad_sch"
+  }
+}
