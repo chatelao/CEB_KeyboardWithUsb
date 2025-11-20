@@ -1,39 +1,41 @@
-name: KiCad ERC and DRC Checks
+name: Automated KiCad Build
 
-on: [push]
+on:
+  push:
+  pull_request:
 
 jobs:
-  build:
+  kibot:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    - name: Install KiCad and jq
-      run: |
-        sudo add-apt-repository ppa:kicad/kicad-9.0-releases -y
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends kicad-nightly jq -y
-        sudo ln -s /usr/lib/kicad-nightly/bin/kicad-cli /usr/bin/kicad-cli
-        export LD_LIBRARY_PATH=/usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-        kicad-cli --version
+      - name: Generate Schematic
+        run: python3 generate_kicad_sch.py
 
-    - name: Generate Schematic
-      run: python3 generate_kicad_sch.py
+      - name: Run KiBot
+        uses: INTI-CMNB/KiBot@v2_k8
+        with:
+          config: kibot.yaml
+          dir: Generated
+          schema: myproject.kicad_sch
+          board: myproject.kicad_pcb
 
-    - name: Run ERC and DRC
-      run: |
-        export LD_LIBRARY_PATH=/usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-        PROJECT_FILE=$(find . -maxdepth 1 -name "*.kicad_pro")
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Automatic_Outputs
+          path: Generated
 
-        # Try to get schematic and pcb files using modern selectors, fallback to legacy
-        SCHEMATIC_FILE=$(jq -r '.root_sheet.path // .sheet_instances.root.sh_filename // .board.sch' $PROJECT_FILE)
-        PCB_FILE=$(jq -r '.board.filename' $PROJECT_FILE)
-
-        if [ -z "$SCHEMATIC_FILE" ] || [ -z "$PCB_FILE" ]; then
-          echo "Could not determine schematic or PCB filename from project file."
-          exit 1
-        fi
-
-        kicad-cli sch erc $SCHEMATIC_FILE
-        kicad-cli pcb drc $PCB_FILE
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            Generated/Docs/Schematic.pdf
+            Generated/Docs/PCB.pdf
+            Generated/Manufacturing/ibom.html
+            Generated/Manufacturing/Gerbers/*
