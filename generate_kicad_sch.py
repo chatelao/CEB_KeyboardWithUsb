@@ -1,12 +1,14 @@
 import uuid
 
 GRID = 2.54
+# Namespace for deterministic UUID generation
+NAMESPACE = uuid.UUID('5460c88c-0803-40a1-99bc-8cb86a64093d')
 
 def g(units):
     return round(units * GRID, 2)
 
-def get_uuid():
-    return str(uuid.uuid4())
+def get_uuid(name):
+    return str(uuid.uuid5(NAMESPACE, name))
 
 HEADER = """(kicad_sch
   (version 20240702)
@@ -127,22 +129,24 @@ SYM_NE555 = """    (symbol "Timer:NE555" (in_bom yes) (on_board yes)
 """
 
 def create_instance(lib_id, ref, value, x, y):
+    uid = get_uuid(f"inst_{ref}")
     return f"""  (symbol
     (lib_id "{lib_id}")
     (at {x} {y} 0)
     (unit 1)
     (in_bom yes)
     (on_board yes)
-    (uuid "{get_uuid()}")
+    (uuid "{uid}")
     (property "Reference" "{ref}" (at {x} {y-2} 0) (effects (font (size 1.27 1.27))))
     (property "Value" "{value}" (at {x} {y+2} 0) (effects (font (size 1.27 1.27))))
   )
 """
 
 def create_label(name, x, y):
+    uid = get_uuid(f"label_{name}_{x}_{y}")
     return f"""  (label "{name}" (at {x} {y} 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "{get_uuid()}")
+    (uuid "{uid}")
   )
 """
 
@@ -198,7 +202,7 @@ def get_pin_pos(comp_pos, lib, pin_num):
     return x, y
 
 def main():
-    content = HEADER.format(uuid_root=get_uuid())
+    content = HEADER.format(uuid_root=get_uuid("root_sheet"))
     content += LIB_SYMBOLS_START
     content += SYM_R
     content += SYM_C
