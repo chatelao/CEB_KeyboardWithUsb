@@ -1,0 +1,35 @@
+kibot:
+  version: 1
+
+preflight:
+  run_erc: true
+  run_drc: true
+  check_zone_fills: true
+  filters:
+    - filter: 'Ignore power pin not driven'
+      error: 'power_pin_not_driven'
+
+outputs:
+  - name: 'schematic_pdf'
+    comment: "Schematic PDF"
+    type: pdf_sch_print
+    dir: 'Docs'
+    options:
+      output: 'Schematic.pdf'
+
+  - name: 'pcb_pdf'
+    comment: "PCB PDF"
+    type: pcb_print
+    dir: 'Docs'
+    options:
+      output: 'PCB.pdf'
+
+  - name: 'ibom'
+    comment: "Interactive BOM"
+    type: ibom
+    dir: 'Manufacturing'
+
+  - name: 'gerbers'
+    comment: "Gerbers"
+    type: gerber
+    dir: 'Manufacturing/Gerbers'
