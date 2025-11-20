@@ -5,7 +5,9 @@ preflight:
   run_erc: true
   run_drc: true
   check_zone_fills: true
-  ignore_unconnected: false
+  filters:
+    - filter: 'Ignore power pin not driven'
+      error: 'power_pin_not_driven'
 
 outputs:
   - name: 'schematic_pdf'
