@@ -1,0 +1,8 @@
+{
+  "board": {
+    "path": "arisu.kicad_pcb"
+  },
+  "root_sheet": {
+    "path": "arisu.sch"
+  }
+}
