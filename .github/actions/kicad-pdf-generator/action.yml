@@ -26,5 +26,5 @@ runs:
         find . -name "*.kicad_pcb" -print0 | while IFS= read -r -d $'\0' file; do
           filename=$(basename "$file" .kicad_pcb)
           dir=$(dirname "$file" | sed 's|^\./||')
-          kicad-cli pcb export pdf --output "${{ inputs.output-path }}/${dir//\//_}_${filename}_pcb.pdf" "$file"
+          kicad-cli pcb export pdf --output "${{ inputs.output-path }}/${dir//\//_}_${filename}_pcb.pdf" "$file" || true
         done
