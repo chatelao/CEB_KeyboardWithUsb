@@ -12,5 +12,5 @@
 - Verify boards with drc
 
 ## On every release
-- Generate all schematics als .pdf
-- Generate all boards als .pdf
+- Generate all schematics als .pdf & publish them as release assets
+- Generate all boards als .pdf & publish them as release assets
