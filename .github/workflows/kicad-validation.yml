@@ -1,0 +1,28 @@
+name: KiCad Validation
+
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    env:
+      LD_LIBRARY_PATH: /usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Set up KiCad 10.0 (nightly)
+      run: |
+        sudo add-apt-repository --yes ppa:kicad/kicad-dev-nightly
+        sudo apt-get update
+        sudo apt-get install -y kicad-nightly
+        # Symlink kicad-cli to a location in PATH
+        sudo ln -s /usr/lib/kicad-nightly/bin/kicad-cli /usr/bin/kicad-cli
+
+    - name: Run ERC (Electrical Rule Check)
+      run: kicad-cli sch erc blossom_modified/arisu.sch || true
+
+    - name: Run DRC (Design Rule Check)
+      run: kicad-cli pcb drc blossom_modified/arisu.kicad_pcb || true
