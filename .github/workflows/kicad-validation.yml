@@ -1,9 +1,14 @@
 name: KiCad Validation
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  release:
+    types: [created]
 
 jobs:
   validate:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     env:
@@ -13,16 +18,49 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v4
 
-    - name: Set up KiCad 10.0 (nightly)
-      run: |
-        sudo add-apt-repository --yes ppa:kicad/kicad-dev-nightly
-        sudo apt-get update
-        sudo apt-get install -y kicad-nightly
-        # Symlink kicad-cli to a location in PATH
-        sudo ln -s /usr/lib/kicad-nightly/bin/kicad-cli /usr/bin/kicad-cli
+    - name: Create artifacts directory
+      run: mkdir -p artifacts
+
+    - name: Generate PDFs
+      uses: ./.github/actions/kicad-pdf-generator
+      with:
+        output-path: artifacts
 
     - name: Run ERC (Electrical Rule Check)
       run: kicad-cli sch erc blossom_modified/arisu.sch || true
 
     - name: Run DRC (Design Rule Check)
       run: kicad-cli pcb drc blossom_modified/arisu.kicad_pcb || true
+
+    - name: Upload PDF artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: pdf-artifacts
+        path: artifacts/
+
+  release:
+    if: github.event_name == 'release'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    env:
+      LD_LIBRARY_PATH: /usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Create release assets directory
+        run: mkdir -p release_assets
+
+      - name: Generate PDFs
+        uses: ./.github/actions/kicad-pdf-generator
+        with:
+          output-path: release_assets
+
+      - name: Upload release assets
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: release_assets/*
+          tag: ${{ github.event.release.tag_name }}
+          overwrite: true
