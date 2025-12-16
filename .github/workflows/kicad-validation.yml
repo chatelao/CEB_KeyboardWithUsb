@@ -15,7 +15,7 @@ jobs:
 
     - name: Set up KiCad 10.0 (nightly)
       run: |
-        sudo add-apt-repository --yes ppa:kicad/kicad-nightly-daily
+        sudo add-apt-repository --yes ppa:kicad/kicad-dev-nightly
         sudo apt-get update
         sudo apt-get install -y kicad-nightly
         # Symlink kicad-cli to a location in PATH
