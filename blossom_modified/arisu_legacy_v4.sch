@@ -1,0 +1,1 @@
+(kicad_sch (version 20210000) (generator kicad_cli))

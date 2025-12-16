@@ -1,0 +1,12 @@
+(kicad_sch (version 20210000) (generator pcbnew)
+  (paper "A4")
+  (title_block
+    (title "Blossom Modified")
+    (rev "1.0")
+    (company "Jules")
+  )
+  (sheet (at 150 100) (size 200 150)
+    (stroke (width 0.254) (type solid) (color 0 0 0 0))
+    (fill (type none))
+  )
+)
