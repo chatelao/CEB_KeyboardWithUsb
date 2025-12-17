@@ -7,20 +7,34 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Upgrade KiCad projects
+      shell: bash
+      env:
+        LD_LIBRARY_PATH: /usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+      run: |
+        set -x
+        find . -name "*.kicad_pro" -exec kicad-cli project upgrade "{}" \;
     - name: Generate PDFs
       shell: bash
       env:
         LD_LIBRARY_PATH: /usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
       run: |
+        set -x
         find . -name "*.kicad_sch" -print0 | while IFS= read -r -d $'\0' file; do
+          echo "Processing schematic: $file"
           filename=$(basename "$file" .kicad_sch)
           dir=$(dirname "$file" | sed 's|^\./||')
-          kicad-cli sch export pdf --output "${{ inputs.output-path }}/${dir//\//_}_${filename}_sch.pdf" "$file"
+          output_file="${{ inputs.output-path }}/${dir//\//_}_${filename}_sch.pdf"
+          echo "Outputting to: $output_file"
+          kicad-cli sch export pdf --output "$output_file" "$file"
         done
         find . -name "*.kicad_pcb" -print0 | while IFS= read -r -d $'\0' file; do
+          echo "Processing PCB: $file"
           filename=$(basename "$file" .kicad_pcb)
           dir=$(dirname "$file" | sed 's|^\./||')
-          kicad-cli pcb export pdf --output "${{ inputs.output-path }}/${dir//\//_}_${filename}_pcb.pdf" "$file" || true
+          output_file="${{ inputs.output-path }}/${dir//\//_}_${filename}_pcb.pdf"
+          echo "Outputting to: $output_file"
+          kicad-cli pcb export pdf --output "$output_file" "$file"
         done
     - name: Verify PDF generation
       shell: bash
