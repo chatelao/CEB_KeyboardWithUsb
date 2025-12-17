@@ -7,13 +7,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Upgrade KiCad projects
-      shell: bash
-      env:
-        LD_LIBRARY_PATH: /usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-      run: |
-        set -x
-        find . -name "*.kicad_pro" -exec kicad-cli project upgrade "{}" \;
     - name: Generate PDFs
       shell: bash
       env:
