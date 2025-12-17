@@ -1,5 +1,5 @@
 name: 'KiCad PDF Generator'
-description: 'Sets up KiCad and generates PDF files for all schematics and PCBs.'
+description: 'Generates PDF files for all schematics and PCBs.'
 inputs:
   output-path:
     description: 'The path to store the generated PDF files.'
@@ -7,16 +7,10 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Set up KiCad 10.0 (nightly)
-      shell: bash
-      run: |
-        sudo add-apt-repository --yes ppa:kicad/kicad-dev-nightly
-        sudo apt-get update
-        sudo apt-get install -y kicad-nightly
-        # Symlink kicad-cli to a location in PATH
-        sudo ln -s /usr/lib/kicad-nightly/bin/kicad-cli /usr/bin/kicad-cli
     - name: Generate PDFs
       shell: bash
+      env:
+        LD_LIBRARY_PATH: /usr/lib/kicad-nightly/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
       run: |
         find . -name "*.kicad_sch" -print0 | while IFS= read -r -d $'\0' file; do
           filename=$(basename "$file" .kicad_sch)

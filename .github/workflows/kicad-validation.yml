@@ -18,8 +18,25 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v4
 
+    - name: Cache KiCad installation
+      uses: actions/cache@v4
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-kicad-nightly-${{ hashFiles('**/kicad-validation.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-kicad-nightly-
     - name: Create artifacts directory
       run: mkdir -p artifacts
+
+    - name: Set up KiCad 10.0 (nightly)
+      shell: bash
+      run: |
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository --yes ppa:kicad/kicad-dev-nightly
+        sudo apt-get update
+        sudo apt-get install -y kicad-nightly
+        # Symlink kicad-cli to a location in PATH
+        sudo ln -s /usr/lib/kicad-nightly/bin/kicad-cli /usr/bin/kicad-cli
 
     - name: Generate PDFs
       uses: ./.github/actions/kicad-pdf-generator
@@ -49,8 +66,25 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Cache KiCad installation
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-kicad-nightly-${{ hashFiles('**/kicad-validation.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-kicad-nightly-
       - name: Create release assets directory
         run: mkdir -p release_assets
+
+      - name: Set up KiCad 10.0 (nightly)
+        shell: bash
+        run: |
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository --yes ppa:kicad/kicad-dev-nightly
+          sudo apt-get update
+          sudo apt-get install -y kicad-nightly
+          # Symlink kicad-cli to a location in PATH
+          sudo ln -s /usr/lib/kicad-nightly/bin/kicad-cli /usr/bin/kicad-cli
 
       - name: Generate PDFs
         uses: ./.github/actions/kicad-pdf-generator
