@@ -22,3 +22,10 @@ runs:
           dir=$(dirname "$file" | sed 's|^\./||')
           kicad-cli pcb export pdf --output "${{ inputs.output-path }}/${dir//\//_}_${filename}_pcb.pdf" "$file" || true
         done
+    - name: Verify PDF generation
+      shell: bash
+      run: |
+        if [ -z "$(ls -A ${{ inputs.output-path }}/*.pdf 2>/dev/null)" ]; then
+          echo "Error: No PDF files found in ${{ inputs.output-path }}"
+          exit 1
+        fi
